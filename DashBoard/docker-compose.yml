@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  dashboard:
+    build: .
+    container_name: family-dashboard-server
+    ports:
+      - "8080:8080"
+
+    environment:
+      # ===== Home Assistant (токен НЕ утекает во фронтенд) =====
+      HA_BASE_URL: "http://homeassistant.local:8123"
+      HA_TOKEN: ""  # вставь Long-Lived Access Token из профиля HA
+
+      # ===== Погода / UI =====
+      LATITUDE: "50.4501"
+      LONGITUDE: "30.5234"
+      TIMEZONE: "Europe/Kyiv"
+      TEMP_UNIT: "celsius"     # или "fahrenheit"
+      WIND_UNIT: "ms"          # или "kmh" | "mph"
+      WEATHER_REFRESH_MS: "900000"
+      SLIDESHOW_INTERVAL_MS: "15000"
+      PHOTOS_MANIFEST_URL: "/photos/photos.json"
+
+      # ===== Какие сущности показывать =====
+      HA_TOGGLES_JSON: '["switch.livingroom_relay","light.kitchen_main","switch.pump_hydroponics"]'
+      HA_SCENES_JSON:  '["scene.morning","scene.night"]'
+      HA_SENSORS_JSON: '["sensor.livingroom_temperature","sensor.outdoor_humidity"]'
+
+      # Если надо раздавать данные на другой origin — перечисли тут (обычно можно оставить пустым)
+      CORS_ALLOWED_ORIGINS: ""
+
+    volumes:
+      - ./public/photos:/app/public/photos:rw
+    restart: unless-stopped
